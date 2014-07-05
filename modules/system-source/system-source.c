@@ -253,6 +253,10 @@ system_generate_system(CfgLexer *lexer, gint type, const gchar *name,
 
   sysblock = g_string_sized_new(1024);
 
+  g_string_append(sysblock,
+                  "channel {\n"
+                  "    source {\n");
+
   if (uname(&u) < 0)
     {
       msg_error("system(): Cannot get information about the running kernel",
@@ -317,6 +321,12 @@ system_generate_system(CfgLexer *lexer, gint type, const gchar *name,
       return FALSE;
     }
 
+  g_string_append(sysblock, "\n"
+                  "    }; # source\n"
+                  "    parser {\n"
+                  "        json-parser(prefix('.cee.') marker('@cee:'));\n"
+                  "    };\n"
+                  "}; # channel\n");
   result = cfg_lexer_include_buffer(lexer, buf, sysblock->str, sysblock->len);
   g_string_free(sysblock, TRUE);
   return result;
