@@ -148,7 +148,7 @@ log_proto_server_options_validate(const LogProtoServerOptions *options)
       if (!(options->encoding))
         {
           msg_error("Invalid use of encoding-mode(strict) without an explicit" \
-              "encoding() specified", NULL);
+              " encoding() specified", NULL);
           return FALSE;
         }
       break;
@@ -157,7 +157,7 @@ log_proto_server_options_validate(const LogProtoServerOptions *options)
       if (options->encoding && (strcmp(options->encoding, "UTF-8") != 0))
         {
           msg_error("Invalid use of explicit non UTF-8 encoding() with current" \
-              "encoding-mode()", NULL);
+              " encoding-mode()", NULL);
           return FALSE;
         }
       break;
@@ -165,7 +165,7 @@ log_proto_server_options_validate(const LogProtoServerOptions *options)
       if (options->encoding)
         {
           msg_error("Invalid use of encoding-mode(8bit-clean) with an explicit" \
-              "encoding() specified", NULL);
+              " encoding() specified", NULL);
           return FALSE;
         }
       break;
