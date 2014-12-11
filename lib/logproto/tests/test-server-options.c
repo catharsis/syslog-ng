@@ -25,6 +25,7 @@ test_log_proto_server_options_valid_encoding(void)
   log_proto_server_options_defaults(&opts);
   /* check that encoding can be set and error is properly returned */
   log_proto_server_options_set_encoding(&opts, "utf-8");
+  log_proto_server_options_set_encoding_mode(&opts, LP_ENCODING_MODE_STRICT);
   assert_string(opts.encoding, "utf-8", "LogProtoServerOptions.encoding was not properly set");
 
   log_proto_server_options_init(&opts, configuration);

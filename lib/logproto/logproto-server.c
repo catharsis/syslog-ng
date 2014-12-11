@@ -130,6 +130,12 @@ log_proto_server_options_set_encoding(LogProtoServerOptions *self, const gchar *
   self->encoding = g_strdup(encoding);
 }
 
+void
+log_proto_server_options_set_encoding_mode(LogProtoServerOptions *self, LogProtoEncodingMode mode)
+{
+  self->encoding_mode = mode;
+}
+
 gboolean
 log_proto_server_options_validate(const LogProtoServerOptions *options)
 {
