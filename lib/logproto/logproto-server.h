@@ -34,18 +34,13 @@ typedef struct _LogProtoServer LogProtoServer;
 typedef struct _LogProtoServerOptions LogProtoServerOptions;
 
 #define LOG_PROTO_SERVER_OPTIONS_SIZE 32
-enum LogProtoServerEncodingMode {
-	LPS_ENCODING_MODE_STRICT = 0,
-	LPS_ENCODING_MODE_ASSUME_UTF8,
-	LPS_ENCODING_MODE_UTF8_WITH_FALLBACK,
-	LPS_ENCODING_MODE_8BIT_CLEAN,
-};
+
 struct _LogProtoServerOptions
 {
   void (*destroy)(LogProtoServerOptions *self);
   gboolean initialized;
   gchar *encoding;
-  enum LogProtoServerEncodingMode encoding_mode;
+  LogProtoEncodingMode encoding_mode;
   GIConv convert;
   /* maximum message length in bytes */
   gint max_msg_size;

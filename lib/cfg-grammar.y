@@ -953,10 +953,10 @@ yesno
 	;
 
 encodingmode
-	: KW_STRICT				{ $$ = 0; }
-	| KW_ASSUME_UTF8		{ $$ = 1; }
-	| KW_UTF8_W_FALLBACK	{ $$ = 2; }
-	| KW_8BIT_CLEAN			{ $$ = 3; }
+	: KW_STRICT				{ $$ = LP_ENCODING_MODE_STRICT; }
+	| KW_ASSUME_UTF8		{ $$ = LP_ENCODING_MODE_ASSUME_UTF8; }
+	| KW_UTF8_W_FALLBACK	{ $$ = LP_ENCODING_MODE_UTF8_WITH_FALLBACK; }
+	| KW_8BIT_CLEAN			{ $$ = LP_ENCODING_MODE_8BIT_CLEAN; }
 	;
 
 dnsmode
@@ -1041,7 +1041,7 @@ source_option
 source_proto_option
         : KW_ENCODING '(' string ')'		{ last_proto_server_options->encoding = g_strdup($3); free($3); }
 	| KW_LOG_MSG_SIZE '(' LL_NUMBER ')'	{ last_proto_server_options->max_msg_size = $3; }
-	| KW_ENCODING_MODE '(' encodingmode ')'		{ last_proto_server_options->encoding_mode = g_strdup($3); free($3); }
+	| KW_ENCODING_MODE '(' encodingmode ')'		{ last_proto_server_options->encoding_mode = $3; }
         ;
 
 source_reader_options
