@@ -141,6 +141,40 @@ log_proto_server_options_validate(const LogProtoServerOptions *options)
                 NULL);
       return FALSE;
     }
+
+  switch (options->encoding_mode)
+    {
+    case LP_ENCODING_MODE_STRICT:
+      if (!(options->encoding))
+        {
+          msg_error("Invalid use of encoding-mode(strict) without an explicit" \
+              "encoding() specified", NULL);
+          return FALSE;
+        }
+      break;
+    case LP_ENCODING_MODE_UTF8_WITH_FALLBACK: /* Fallthrough */
+    case LP_ENCODING_MODE_ASSUME_UTF8:
+      if (options->encoding && (strcmp(options->encoding, "UTF-8") != 0))
+        {
+          msg_error("Invalid use of explicit non UTF-8 encoding() with current" \
+              "encoding-mode()", NULL);
+          return FALSE;
+        }
+      break;
+    case LP_ENCODING_MODE_8BIT_CLEAN:
+      if (options->encoding)
+        {
+          msg_error("Invalid use of encoding-mode(8bit-clean) with an explicit" \
+              "encoding() specified", NULL);
+          return FALSE;
+        }
+      break;
+    case LP_ENCODING_MODE_UNSPECIFIED:
+      /* This should be a dead path, since we explicitly override the
+       * default on init
+       **/
+      break;
+    }
   return TRUE;
 }
 
