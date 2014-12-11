@@ -70,8 +70,28 @@ test_log_proto_server_options_encoding_mode_strict(void)
   assert_false(success, "Successfully set strict encoding mode, without specifying an encoding");
 
   log_proto_server_options_destroy(&opts);
-
 }
+
+static void
+test_log_proto_server_options_encoding_mode_8bit_clean(void)
+{
+  LogProtoServerOptions opts;
+  gboolean success;
+
+  log_proto_server_options_defaults(&opts);
+  log_proto_server_options_set_encoding_mode(&opts, LP_ENCODING_MODE_8BIT_CLEAN);
+  log_proto_server_options_set_encoding(&opts, "utf-8");
+  assert_true(LP_ENCODING_MODE_8BIT_CLEAN == opts.encoding_mode, "Setting encoding-mode to strict failed");
+
+  log_proto_server_options_init(&opts, configuration);
+  start_grabbing_messages();
+  success = log_proto_server_options_validate(&opts);
+  assert_grabbed_messages_contain("Invalid use of encoding-mode(8bit-clean) with an explicit encoding() specified", "message about encoding-mode(8bit-clean) being invalid with explicit encoding specified missing");
+  assert_false(success, "Successfully set 8bit-clean encoding mode, with an explicit encoding");
+
+  log_proto_server_options_destroy(&opts);
+}
+
 /* abstract LogProtoServer methods */
 void
 test_log_proto_server_options(void)
