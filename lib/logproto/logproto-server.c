@@ -182,6 +182,14 @@ log_proto_server_options_init(LogProtoServerOptions *options, GlobalConfig *cfg)
       /* validate the character set */
       options->convert = g_iconv_open("utf-8", options->encoding);
     }
+
+  if (options->encoding_mode == LP_ENCODING_MODE_UNSPECIFIED)
+    {
+      /* set default encoding mode (8bit clean, for now - utf8 w/ fallback in
+       * the future?)
+       */
+      options->encoding_mode = LP_ENCODING_MODE_8BIT_CLEAN;
+    }
   options->initialized = TRUE;
 }
 
