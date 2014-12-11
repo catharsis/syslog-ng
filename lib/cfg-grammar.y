@@ -186,6 +186,7 @@ extern struct _StatsOptions *last_stats_options;
 %token KW_TABLE                       10038
 %token KW_ENCODING                    10039
 %token KW_SESSION_STATEMENTS          10040
+%token KW_ENCODING_MODE               10041
 
 %token KW_DELIMITERS                  10050
 %token KW_QUOTES                      10051
@@ -242,6 +243,11 @@ extern struct _StatsOptions *last_stats_options;
 
 %token KW_THROTTLE                    10170
 %token KW_THREADED                    10171
+
+%token KW_STRICT                      10180
+%token KW_ASSUME_UTF8                 10181
+%token KW_UTF8_W_FALLBACK             10182
+%token KW_8BIT_CLEAN                  10183
 
 /* log statement options */
 %token KW_FLAGS                       10190
@@ -439,6 +445,7 @@ StatsOptions *last_stats_options;
 
 %type	<num> yesno
 %type   <num> dnsmode
+%type   <num> encodingmode
 %type	<num> dest_writer_options_flags
 
 %type	<cptr> string
@@ -945,6 +952,13 @@ yesno
 	| LL_NUMBER				{ $$ = $1; }
 	;
 
+encodingmode
+	: KW_STRICT				{ $$ = 0; }
+	| KW_ASSUME_UTF8		{ $$ = 1; }
+	| KW_UTF8_W_FALLBACK	{ $$ = 2; }
+	| KW_8BIT_CLEAN			{ $$ = 3; }
+	;
+
 dnsmode
 	: yesno					{ $$ = $1; }
 	| KW_PERSIST_ONLY                       { $$ = 2; }
@@ -1027,6 +1041,7 @@ source_option
 source_proto_option
         : KW_ENCODING '(' string ')'		{ last_proto_server_options->encoding = g_strdup($3); free($3); }
 	| KW_LOG_MSG_SIZE '(' LL_NUMBER ')'	{ last_proto_server_options->max_msg_size = $3; }
+	| KW_ENCODING_MODE '(' encodingmode ')'		{ last_proto_server_options->encoding_mode = g_strdup($3); free($3); }
         ;
 
 source_reader_options
