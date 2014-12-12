@@ -73,7 +73,7 @@ test_log_proto_server_options_encoding_mode_strict(void)
 }
 
 static void
-test_log_proto_server_options_encoding_mode_8bit_clean(void)
+test_log_proto_server_options_encoding_mode_8bit_clean_w_encoding(void)
 {
   LogProtoServerOptions opts;
   gboolean success;
@@ -81,13 +81,144 @@ test_log_proto_server_options_encoding_mode_8bit_clean(void)
   log_proto_server_options_defaults(&opts);
   log_proto_server_options_set_encoding_mode(&opts, LP_ENCODING_MODE_8BIT_CLEAN);
   log_proto_server_options_set_encoding(&opts, "utf-8");
-  assert_true(LP_ENCODING_MODE_8BIT_CLEAN == opts.encoding_mode, "Setting encoding-mode to strict failed");
+  assert_true(LP_ENCODING_MODE_8BIT_CLEAN == opts.encoding_mode, "Setting encoding-mode to 8bit-clean failed");
 
   log_proto_server_options_init(&opts, configuration);
   start_grabbing_messages();
   success = log_proto_server_options_validate(&opts);
   assert_grabbed_messages_contain("Invalid use of encoding-mode(8bit-clean) with an explicit encoding() specified", "message about encoding-mode(8bit-clean) being invalid with explicit encoding specified missing");
   assert_false(success, "Successfully set 8bit-clean encoding mode, with an explicit encoding");
+
+  log_proto_server_options_destroy(&opts);
+}
+
+static void
+test_log_proto_server_options_encoding_mode_8bit_clean_wo_encoding(void)
+{
+  LogProtoServerOptions opts;
+  gboolean success;
+
+  log_proto_server_options_defaults(&opts);
+  log_proto_server_options_set_encoding_mode(&opts, LP_ENCODING_MODE_8BIT_CLEAN);
+  assert_true(LP_ENCODING_MODE_8BIT_CLEAN == opts.encoding_mode, "Setting encoding-mode to 8bit-clean failed");
+
+  log_proto_server_options_init(&opts, configuration);
+  success = log_proto_server_options_validate(&opts);
+  assert_true(success, "Failed to set 8bit-clean encoding mode, without an explicit encoding");
+
+  log_proto_server_options_destroy(&opts);
+}
+
+static void
+test_log_proto_server_options_encoding_mode_assume_utf8_non_utf8_encoding(void)
+{
+  LogProtoServerOptions opts;
+  gboolean success;
+
+  log_proto_server_options_defaults(&opts);
+  log_proto_server_options_set_encoding_mode(&opts, LP_ENCODING_MODE_ASSUME_UTF8);
+  log_proto_server_options_set_encoding(&opts, "UCS-2");
+  assert_true(LP_ENCODING_MODE_ASSUME_UTF8 == opts.encoding_mode, "Setting encoding-mode to assume-utf8 failed");
+  assert_string(opts.encoding, "UCS-2", "LogProtoServerOptions.encoding was not properly set");
+
+  log_proto_server_options_init(&opts, configuration);
+  start_grabbing_messages();
+  success = log_proto_server_options_validate(&opts);
+  assert_grabbed_messages_contain("Invalid use of explicit non UTF-8 encoding() with current encoding-mode(); encoding='UCS-2'", "message about encoding-mode(assume-utf8) being invalid with non utf-8 encoding() missing");
+  assert_false(success, "Succesfully set assume-utf8 encoding mode with a non-utf8 encoding");
+
+  log_proto_server_options_destroy(&opts);
+}
+
+static void
+test_log_proto_server_options_encoding_mode_assume_utf8_utf8_encoding(void)
+{
+  LogProtoServerOptions opts;
+  gboolean success;
+
+  log_proto_server_options_defaults(&opts);
+  log_proto_server_options_set_encoding_mode(&opts, LP_ENCODING_MODE_ASSUME_UTF8);
+  log_proto_server_options_set_encoding(&opts, "utf-8");
+  assert_true(LP_ENCODING_MODE_ASSUME_UTF8 == opts.encoding_mode, "Setting encoding-mode to assume-utf8 failed");
+  assert_string(opts.encoding, "utf-8", "LogProtoServerOptions.encoding was not properly set");
+
+  log_proto_server_options_init(&opts, configuration);
+  success = log_proto_server_options_validate(&opts);
+  assert_true(success, "Failed to set assume-utf8 encoding mode with utf8 encoding");
+
+  log_proto_server_options_destroy(&opts);
+}
+
+static void
+test_log_proto_server_options_encoding_mode_assume_utf8_no_encoding(void)
+{
+  LogProtoServerOptions opts;
+  gboolean success;
+
+  log_proto_server_options_defaults(&opts);
+  log_proto_server_options_set_encoding_mode(&opts, LP_ENCODING_MODE_ASSUME_UTF8);
+  assert_true(LP_ENCODING_MODE_ASSUME_UTF8 == opts.encoding_mode, "Setting encoding-mode to assume-utf8 failed");
+
+  log_proto_server_options_init(&opts, configuration);
+  success = log_proto_server_options_validate(&opts);
+  assert_true(success, "Failed to set assume-utf8 encoding mode without encoding");
+
+  log_proto_server_options_destroy(&opts);
+}
+
+static void
+test_log_proto_server_options_encoding_mode_utf8_with_fallback_non_utf8_encoding(void)
+{
+  LogProtoServerOptions opts;
+  gboolean success;
+  log_proto_server_options_defaults(&opts);
+  log_proto_server_options_set_encoding_mode(&opts, LP_ENCODING_MODE_UTF8_WITH_FALLBACK);
+  log_proto_server_options_set_encoding(&opts, "UCS-2");
+
+  assert_true(LP_ENCODING_MODE_UTF8_WITH_FALLBACK == opts.encoding_mode, "Setting encoding-mode to utf8-with-fallback failed");
+  assert_string(opts.encoding, "UCS-2", "LogProtoServerOptions.encoding was not properly set");
+
+  log_proto_server_options_init(&opts, configuration);
+  start_grabbing_messages();
+  success = log_proto_server_options_validate(&opts);
+  assert_grabbed_messages_contain("Invalid use of explicit non UTF-8 encoding() with current encoding-mode(); encoding='UCS-2'", "message about encoding-mode(utf8-with-fallback) being invalid with non utf-8 encoding() missing");
+  assert_false(success, "Succesfully set utf8-with-fallback encoding mode with a non-utf8 encoding");
+
+  log_proto_server_options_destroy(&opts);
+}
+
+static void
+test_log_proto_server_options_encoding_mode_utf8_with_fallback_utf8_encoding(void)
+{
+  LogProtoServerOptions opts;
+  gboolean success;
+
+  log_proto_server_options_defaults(&opts);
+  log_proto_server_options_set_encoding_mode(&opts, LP_ENCODING_MODE_UTF8_WITH_FALLBACK);
+  log_proto_server_options_set_encoding(&opts, "utf-8");
+  assert_true(LP_ENCODING_MODE_UTF8_WITH_FALLBACK== opts.encoding_mode, "Setting encoding-mode to utf8-with-fallback failed");
+  assert_string(opts.encoding, "utf-8", "LogProtoServerOptions.encoding was not properly set");
+
+  log_proto_server_options_init(&opts, configuration);
+  success = log_proto_server_options_validate(&opts);
+  assert_true(success, "Failed to set utf8-with-fallback encoding mode with utf8 encoding");
+
+  log_proto_server_options_destroy(&opts);
+}
+
+static void
+test_log_proto_server_options_encoding_mode_utf8_with_fallback_no_encoding(void)
+{
+  LogProtoServerOptions opts;
+  gboolean success;
+
+  log_proto_server_options_defaults(&opts);
+  log_proto_server_options_set_encoding_mode(&opts, LP_ENCODING_MODE_UTF8_WITH_FALLBACK);
+  assert_true(LP_ENCODING_MODE_UTF8_WITH_FALLBACK == opts.encoding_mode, "Setting encoding-mode to utf8-with-fallback failed");
+
+  log_proto_server_options_init(&opts, configuration);
+  success = log_proto_server_options_validate(&opts);
+  assert_true(success, "Failed to set utf8-with-fallback encoding mode without encoding");
 
   log_proto_server_options_destroy(&opts);
 }
@@ -100,4 +231,12 @@ test_log_proto_server_options(void)
   PROTO_TESTCASE(test_log_proto_server_options_valid_encoding);
   PROTO_TESTCASE(test_log_proto_server_options_invalid_encoding);
   PROTO_TESTCASE(test_log_proto_server_options_encoding_mode_strict);
+  PROTO_TESTCASE(test_log_proto_server_options_encoding_mode_8bit_clean_w_encoding);
+  PROTO_TESTCASE(test_log_proto_server_options_encoding_mode_8bit_clean_wo_encoding);
+  PROTO_TESTCASE(test_log_proto_server_options_encoding_mode_assume_utf8_non_utf8_encoding);
+  PROTO_TESTCASE(test_log_proto_server_options_encoding_mode_assume_utf8_utf8_encoding);
+  PROTO_TESTCASE(test_log_proto_server_options_encoding_mode_assume_utf8_no_encoding);
+  PROTO_TESTCASE(test_log_proto_server_options_encoding_mode_utf8_with_fallback_non_utf8_encoding);
+  PROTO_TESTCASE(test_log_proto_server_options_encoding_mode_utf8_with_fallback_utf8_encoding);
+  PROTO_TESTCASE(test_log_proto_server_options_encoding_mode_utf8_with_fallback_no_encoding);
 }
