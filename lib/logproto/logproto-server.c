@@ -160,10 +160,12 @@ log_proto_server_options_validate(const LogProtoServerOptions *options)
       break;
     case LP_ENCODING_MODE_UTF8_WITH_FALLBACK: /* Fallthrough */
     case LP_ENCODING_MODE_ASSUME_UTF8:
-      if (options->encoding && (strcmp(options->encoding, "UTF-8") != 0))
+      if (options->encoding && (g_ascii_strcasecmp(options->encoding, "utf-8") != 0))
         {
           msg_error("Invalid use of explicit non UTF-8 encoding() with current" \
-              " encoding-mode()", NULL);
+			  " encoding-mode()",
+			  evt_tag_str("encoding", options->encoding),
+			  NULL);
           return FALSE;
         }
       break;
