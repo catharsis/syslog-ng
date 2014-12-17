@@ -657,5 +657,18 @@ log_reader_options_process_flag(LogReaderOptions *options, gchar *flag)
 {
   if (!msg_format_options_process_flag(&options->parse_options, flag))
     return cfg_process_flag(log_reader_flag_handlers, options, flag);
+  if(options->parse_options.flags & LP_ASSUME_UTF8)
+    {
+      log_proto_server_options_set_encoding_mode(&options->proto_options.super,
+						 LP_ENCODING_MODE_ASSUME_UTF8);
+      msg_warning("WARNING: input: the assume-utf8 flag is deprecated as of version " VERSION_3_7 ", falling back to encoding-mode(assume-utf8)", NULL);
+    }
+  if(options->parse_options.flags & LP_VALIDATE_UTF8)
+    {
+      log_proto_server_options_set_encoding_mode(&options->proto_options.super,
+						 LP_ENCODING_MODE_UTF8_WITH_FALLBACK
+						 );
+      msg_warning("WARNING: input: the validate-utf8 flag is deprecated as of version " VERSION_3_7 ", falling back to encoding-mode(utf8-with-fallback)", NULL);
+    }
   return TRUE;
 }
