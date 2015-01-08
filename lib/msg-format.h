@@ -39,9 +39,9 @@ enum
   LP_CHECK_HOSTNAME  = 0x0002,
   /* message is using RFC5424 format */
   LP_SYSLOG_PROTOCOL = 0x0004,
-  /* the caller knows the message is valid UTF-8 */
+  /* DEPRECATED! the caller knows the message is valid UTF-8 */
   LP_ASSUME_UTF8     = 0x0008,
-  /* validate that all characters are indeed UTF-8 and mark the message as valid when relaying */
+  /* DEPRECATED! validate that all characters are indeed UTF-8 and mark the message as valid when relaying */
   LP_VALIDATE_UTF8   = 0x0010,
   /* the message may not contain NL characters, strip them if it does */
   LP_NO_MULTI_LINE   = 0x0020,

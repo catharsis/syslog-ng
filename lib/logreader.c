@@ -303,18 +303,34 @@ static gboolean
 log_reader_handle_line(LogReader *self, const guchar *line, gint length, LogTransportAuxData *aux)
 {
   LogMessage *m;
+  guint32 encoding_flags = 0x0;
   LogPathOptions path_options = LOG_PATH_OPTIONS_INIT;
-  
+
   msg_debug("Incoming log entry", 
             evt_tag_printf("line", "%.*s", length, line),
             NULL);
+
+  switch (self->options->proto_options.super.encoding_mode)
+    {
+    case LP_ENCODING_MODE_STRICT:
+      break;
+    case LP_ENCODING_MODE_UTF8_WITH_FALLBACK:
+      break;
+    case LP_ENCODING_MODE_ASSUME_UTF8:
+      encoding_flags |= LF_UTF8;
+      break;
+    case LP_ENCODING_MODE_8BIT_CLEAN:
+      break;
+    }
+
   /* use the current time to get the time zone offset */
   m = log_msg_new((gchar *) line, length,
                   aux->peer_addr ? : self->peer_addr,
                   &self->options->parse_options);
+  m->flags |= encoding_flags;
 
   log_msg_refcache_start_producer(m);
-  
+
   log_transport_aux_data_foreach(aux, _add_aux_nvpair, m);
 
   log_pipe_queue(&self->super.super, m, &path_options);

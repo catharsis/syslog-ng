@@ -944,8 +944,6 @@ log_msg_parse_legacy(const MsgFormatOptions *parse_options,
     }
 
   log_msg_set_value(self, LM_V_MESSAGE, (gchar *) src, left);
-  if ((parse_options->flags & LP_VALIDATE_UTF8) && g_utf8_validate((gchar *) src, left, NULL))
-    self->flags |= LF_UTF8;
 
   return TRUE;
 }
@@ -1045,10 +1043,6 @@ log_msg_parse_syslog_proto(const MsgFormatOptions *parse_options, const guchar *
       src += 3;
       left -= 3;
     }
-  else if ((parse_options->flags & LP_VALIDATE_UTF8) && g_utf8_validate((gchar *) src, left, NULL))
-    {
-      self->flags |= LF_UTF8;
-    }
   log_msg_set_value(self, LM_V_MESSAGE, (gchar *) src, left);
   return TRUE;
 }
@@ -1071,9 +1065,6 @@ syslog_format_handler(const MsgFormatOptions *parse_options,
       self->pri = parse_options->default_pri;
       return;
     }
-
-  if (parse_options->flags & LP_ASSUME_UTF8)
-    self->flags |= LF_UTF8;
 
   if (parse_options->flags & LP_LOCAL)
     self->flags |= LF_LOCAL;
