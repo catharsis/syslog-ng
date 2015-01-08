@@ -1108,6 +1108,19 @@ log_msg_new(const gchar *msg, gint length,
   LogMessage *self = log_msg_alloc(length == 0 ? 256 : length * 2);
 
   log_msg_init(self, saddr);
+  switch (parse_options->encoding_mode)
+    {
+    case LP_ENCODING_MODE_STRICT:
+      break;
+    case LP_ENCODING_MODE_UTF8_WITH_FALLBACK:
+      break;
+    case LP_ENCODING_MODE_ASSUME_UTF8:
+      self->flags |= LF_UTF8;
+      break;
+    case LP_ENCODING_MODE_8BIT_CLEAN:
+      break;
+    }
+
 
   if (G_LIKELY(parse_options->format_handler))
     {
